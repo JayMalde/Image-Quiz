@@ -164,9 +164,11 @@ img{
 
 <script>
 // 1 minutes from now
-var time_in_minutes = 1;
+// var time_in_minutes = 1;
+var time_in_seconds = 10;
 var current_time = Date.parse(new Date());
-var deadline = new Date(current_time + time_in_minutes*60*1000);
+// var deadline = new Date(current_time + time_in_minutes*60*1000);
+var deadline = new Date(current_time + time_in_seconds*1000);
 
 
 function time_remaining(endtime){

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 22, 2021 at 09:09 AM
+-- Generation Time: Nov 23, 2021 at 07:35 AM
 -- Server version: 10.4.11-MariaDB
 -- PHP Version: 7.2.27
 
@@ -70,7 +70,48 @@ CREATE TABLE `quiz1` (
 
 INSERT INTO `quiz1` (`id`, `que`, `image`, `ans`, `userans`) VALUES
 (1, 'What does this image say?', '/quiz_demo/images/cat.jpg', 'cat', 'cat'),
-(2, 'what is this?', '/quiz_demo/images/elephant.jpg', 'elephant', 'elephant');
+(2, 'what is this?', '/quiz_demo/images/elephant.jpg', 'elephant', 'cat');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `score`
+--
+
+CREATE TABLE `score` (
+  `score_id` int(11) NOT NULL,
+  `username` varchar(100) NOT NULL,
+  `correct_answers` int(11) NOT NULL,
+  `total_score` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `score`
+--
+
+INSERT INTO `score` (`score_id`, `username`, `correct_answers`, `total_score`) VALUES
+(1, 'jay', 2, 20),
+(2, 'jay malde', 1, 10);
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `score`
+--
+ALTER TABLE `score`
+  ADD PRIMARY KEY (`score_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `score`
+--
+ALTER TABLE `score`
+  MODIFY `score_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
