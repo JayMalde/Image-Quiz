@@ -2,7 +2,7 @@
 <?php require 'dbconfig.php';
 session_start(); ?>
 <head>
-<title>Technopoints Quiz</title>
+<title>Quizzard</title>
 <style>
 body {
     /* background: url("bg.jpg");
@@ -85,13 +85,12 @@ img{
     color: Black;
 }
 </style>  
-<script type="text/javascript" src="jquery-1.6.2.min.js"></script>
 </head>
 <body><center>
 <div class="title">Quiz</div>
-<p id="demo"></p>
+<div id="clockdiv"></div>
 <?php 															
-	if (isset($_POST['click']) || isset($_GET['start'])) {
+	if (isset($_POST['click']) || isset($_GET['start']) && isset($_GET['uname'])) {
         @$_SESSION['clicks'] += 1 ;
         $c = $_SESSION['clicks'];
         if(isset($_POST['userans'])) { $userselected = $_POST['userans'];
@@ -107,7 +106,15 @@ img{
         
         //echo($_SESSION['clicks']);
         ?>
-<div class="bump"><br><form><?php if($_SESSION['clicks']==0){ ?> <button class="button" name="start" float="left"><span>START QUIZ</span></button> <?php } ?></form></div>
+<div class="bump">
+  <br>
+  <form>
+    <?php if($_SESSION['clicks']==0){ ?> 
+      <input type="text" placeholder="firstname lastname" name="uname" required/><br>
+      <button class="button" name="start" float="left"><span>START QUIZ</span></button>
+    <?php } ?>
+  </form>
+</div>
 <form action="" method="post">  				
 <table><?php if(isset($c)) {   $fetchqry = "SELECT * FROM `quiz1` where id='$c'"; 
 				$result=mysqli_query($con,$fetchqry);
@@ -117,11 +124,10 @@ img{
 <tr><td><h3><br><?php echo @$row['que'];?></h3></td></tr> <?php if($_SESSION['clicks'] > 0 && $_SESSION['clicks'] < 3){ ?>
   <tr><td><img src="<?php echo @$row['image'];?>"/></td></tr><br>
   <tr><td><input type="text" name="userans"/></td></tr><br>
-  <tr><td><button class="button3" name="click" >Next</button></td></tr> <?php }  
+  <tr><td><button class="button3" name="click" id="click" >Next</button></td></tr> <?php }  
 		?> 
   <form>
  <?php if($_SESSION['clicks']>2){ 
-    //  $_GET['subject'];
 	$qry3 = "SELECT `ans`, `userans` FROM `quiz1`;";
 	$result3 = mysqli_query($con,$qry3);
 	$storeArray = Array();
@@ -134,42 +140,60 @@ img{
  ?> 
  
  
- <h2>Result</h2>
- <span>No. of Correct Answer:&nbsp;<?php echo $no = @$_SESSION['score']; 
+ <h2>Result</h2><br>
+ <?php
+    $uname=$_GET["uname"];
+    $no = @$_SESSION['score'];
+    $score = $no*10;
+    $sql = "INSERT INTO score (username, correct_answers, total_score) VALUES ('$uname', $no, $score)";
+
+    if ($con  ->query($sql) === TRUE) {
+        echo "New record created successfully<br>";
+    }
+    else {
+      echo "Error: " . $sql . "<br>" . $con->error;
+    }
+ ?>
+ <br>
+ <span><?php echo $uname; ?></span>
+ <span>No. of Correct Answer:&nbsp;<?php echo $no;
  session_unset(); ?></span><br>
- <span>Your Score:&nbsp<?php echo $no*10; ?></span>
+ <span>Your Score:&nbsp<?php echo $score; ?></span>
 <?php } ?>
 </center>
 
 <script>
-// Set the date we're counting down to
-var countDownDate = new Date("Nov 22, 2021 22:00:0").getTime();
+// 1 minutes from now
+var time_in_minutes = 1;
+var current_time = Date.parse(new Date());
+var deadline = new Date(current_time + time_in_minutes*60*1000);
 
-// Update the count down every 1 second
-var x = setInterval(function() {
 
-  // Get today's date and time
-  var now = new Date().getTime();
-    
-  // Find the distance between now and the count down date
-  var distance = countDownDate - now;
-    
-  // Time calculations for days, hours, minutes and seconds
-  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-    
-  // Output the result in an element with id="demo"
-  document.getElementById("demo").innerHTML = days + "d " + hours + "h "
-  + minutes + "m " + seconds + "s ";
-    
-  // If the count down is over, write some text 
-  if (distance < 0) {
-    clearInterval(x);
-    document.getElementById("demo").innerHTML = "EXPIRED";
+function time_remaining(endtime){
+	var t = Date.parse(endtime) - Date.parse(new Date());
+	var seconds = Math.floor( (t/1000) % 60 );
+	var minutes = Math.floor( (t/1000/60) % 60 );
+	var hours = Math.floor( (t/(1000*60*60)) % 24 );
+	var days = Math.floor( t/(1000*60*60*24) );
+	return {'total':t, 'days':days, 'hours':hours, 'minutes':minutes, 'seconds':seconds};
+}
+function run_clock(id,endtime){
+	var clock = document.getElementById(id);
+	function update_clock(){
+		var t = time_remaining(endtime);
+		clock.innerHTML = 'Time-> '+t.minutes+' : '+t.seconds;
+		
+    if(t.total<=0)
+    { 
+      clearInterval(timeinterval);
+      document.getElementById("click").click();
+    }
+	
   }
-}, 1000);
+	update_clock(); // run function once at first to avoid delay
+	var timeinterval = setInterval(update_clock,1000);
+}
+run_clock('clockdiv',deadline);
 </script>
 </body>
 </html>
